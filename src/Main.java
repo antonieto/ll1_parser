@@ -1,9 +1,8 @@
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Stack;
 
-public class main {
-    public static Stack<String> st = new Stack<String>();
+public class Main {
+    public static Stack<String> st = new Stack<>();
     public static ParsingTable table = new ParsingTable(
             List.of(
                     new NonTerminalSymbol("S"),
@@ -50,13 +49,12 @@ public class main {
 
     public static void main(String[] args) {
         // 1. Init stack (add $, S)
-        st.push("$");
         st.push("S");
 
-        String test = "(f(";
+        String test = "(f($";
         int charPointer = 0;
 
-        while (!st.isEmpty() && charPointer < test.length()) {
+        while (!st.isEmpty()) {
             String current = String.valueOf(test.charAt(charPointer));
             // Top of stack
             String top = st.peek();
@@ -68,17 +66,20 @@ public class main {
                 st.pop();
                 charPointer++;
             }
-            if (table.isNonTerminal(top)) {
+            else if (table.isNonTerminal(top)) {
                 var rule = table.at(top, current);
                 if (rule.isEmpty()) {
-                    System.out.println("ERROR!");
+                    System.out.println("ERROR here!");
                     return;
                 }
+                st.pop();
                 String production = rule.get().getProduction();
-                System.out.println("Inserting production: " + production);
                 for (int i = production.length() - 1; i >= 0; --i) {
                     st.push(String.valueOf(production.charAt(i)));
                 }
+            } else {
+                System.out.println("symbol not found");
+                return;
             }
         }
         System.out.println("Sequence processed successfully!");
