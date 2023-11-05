@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Token {
     private final String symbol;
     Token(String symbol)  {

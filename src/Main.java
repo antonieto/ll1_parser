@@ -1,87 +1,60 @@
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
 public class Main {
-    public static Stack<String> st = new Stack<>();
-    public static ParsingTable table = new ParsingTable(
-            List.of(
-                    new NonTerminalSymbol("S"),
-                    new NonTerminalSymbol("A"),
-                    new NonTerminalSymbol("B"),
-                    new NonTerminalSymbol("F"),
-                    new NonTerminalSymbol("R"),
-                    new NonTerminalSymbol("P"),
-                    new NonTerminalSymbol("Q")
-            ),
-            List.of(
-                    new TerminalSymbol("+"),
-                    new TerminalSymbol("("),
-                    new TerminalSymbol(")"),
-                    new TerminalSymbol(","),
-                    new TerminalSymbol("f"),
-                    new TerminalSymbol("$"),
-                    new TerminalSymbol("n")
-            ),
-            List.of(
-                    new ParsingTableEntry("S", "(", new Rule("S", "A$")),
-                    new ParsingTableEntry("S", "f", new Rule("S", "A$")),
-                    new ParsingTableEntry("S", "n", new Rule("S", "A$")),
-                    new ParsingTableEntry("A", "(", new Rule("A", "FB")),
-                    new ParsingTableEntry("A", "f", new Rule("A", "FB")),
-                    new ParsingTableEntry("A", "n", new Rule("A", "FB")),
-                    new ParsingTableEntry("B", "+", new Rule("B", "+FB")),
-                    new ParsingTableEntry("B", ")", new Rule("B", "\0")),
-                    new ParsingTableEntry("B", "$", new Rule("B", "\0")),
-                    new ParsingTableEntry("F", "(", new Rule("F", "(A)")),
-                    new ParsingTableEntry("F", "f", new Rule("F", "f(R")),
-                    new ParsingTableEntry("F", "n", new Rule("F", "n")),
-                    new ParsingTableEntry("R", "(", new Rule("R", "P)")),
-                    new ParsingTableEntry("R", ")", new Rule("R", ")")),
-                    new ParsingTableEntry("R", "f", new Rule("R", "P)")),
-                    new ParsingTableEntry("R", "n", new Rule("R", "P)")),
-                    new ParsingTableEntry("P", "(", new Rule("P", "AQ")),
-                    new ParsingTableEntry("P", "f", new Rule("P", "AQ")),
-                    new ParsingTableEntry("P", "n", new Rule("P", "AQ")),
-                    new ParsingTableEntry("Q", ")", new Rule("Q", "\0")),
-                    new ParsingTableEntry("Q", ",", new Rule("Q", ",A"))
-            )
-    );
-
     public static void main(String[] args) {
-        // 1. Init stack (add $, S)
-        st.push("S");
+        // Declare all tokens (non-terminals and terminals)
+        YYToken[] tokenList = {
+                YYToken.nonTerminal("S"),
+                YYToken.nonTerminal("A"),
+                YYToken.nonTerminal("B"),
+                YYToken.nonTerminal("F"),
+                YYToken.nonTerminal("R"),
+                YYToken.nonTerminal("P"),
+                YYToken.nonTerminal("Q"),
+                YYToken.terminal("+"),
+                YYToken.terminal("("),
+                YYToken.terminal(")"),
+                YYToken.terminal(","),
+                YYToken.terminal("f"),
+                YYToken.DOLLAR,
+                YYToken.terminal("n"),
+        };
+        try {
+            var table = ParsingTable.builder(Arrays.asList(tokenList))
+                    .add("S", "(", "A $")
+                    .add("S", "f", "A $")
+                    .add("S", "n", "A $")
 
-        String test = "(f($";
-        int charPointer = 0;
+                    .add("A", "(", "F B")
+                    .add("A", "f", "F B")
+                    .add("A", "n", "F B")
 
-        while (!st.isEmpty()) {
-            String current = String.valueOf(test.charAt(charPointer));
-            // Top of stack
-            String top = st.peek();
-            if (table.isTerminal(top) || top.equals("$")) {
-                if (!top.equals(current)) {
-                    System.out.println("ERROR!");
-                    return;
-                }
-                st.pop();
-                charPointer++;
-            }
-            else if (table.isNonTerminal(top)) {
-                var rule = table.at(top, current);
-                if (rule.isEmpty()) {
-                    System.out.println("ERROR here!");
-                    return;
-                }
-                st.pop();
-                String production = rule.get().getProduction();
-                for (int i = production.length() - 1; i >= 0; --i) {
-                    st.push(String.valueOf(production.charAt(i)));
-                }
-            } else {
-                System.out.println("symbol not found");
-                return;
-            }
+                    .add("B", "+", "A $")
+                    .add("B", ")", "A $")
+                    .add("B", "$", "A $")
+
+                    .add("F", "(", "( A )")
+                    .add("F", "f", "f ( R")
+                    .add("F", "n", "n")
+
+                    .add("R", "(", "P )")
+                    .add("R", ")", ")")
+                    .add("R", "f", "P )")
+                    .add("R", "n", "P )")
+
+                    .add("P", "(", "A Q")
+                    .add("P", "f", "A Q")
+                    .add("P", "n", "A Q")
+
+                    .add("Q", ")", "\0")
+                    .add("Q", ",", ", A")
+                    .build();
+        } catch (GrammarException exc) {
+            System.out.println("Invalid parsing table");
+            System.out.println(exc.toString());
         }
-        System.out.println("Sequence processed successfully!");
+
     }
 }

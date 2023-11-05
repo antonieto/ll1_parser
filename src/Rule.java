@@ -1,13 +1,14 @@
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * A class that represents a CFG production rule
  */
 public class Rule {
     private NonTerminalSymbol ant;
-    private String production;
+    private List<YYToken> production;
 
-    Rule(String ant, String production) {
+    Rule(String ant, List<YYToken> production) {
         this.ant = new NonTerminalSymbol(ant);
         this.production = production;
     }
@@ -19,7 +20,7 @@ public class Rule {
         return str.toString();
     }
 
-    public String getProduction() {
-        return this.production;
+    public Optional<String> getProduction() {
+        return this.production.stream().map(YYToken::toString).reduce((el, acc) ->  acc + el);
     }
 }

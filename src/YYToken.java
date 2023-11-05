@@ -5,7 +5,7 @@ import java.util.Objects;
  */
 public class YYToken {
     public TokenType type;
-    static YYToken EPSILON = new YYToken("", TokenType.NON_TERMINAL);
+    static YYToken EPSILON = new YYToken("\0", TokenType.NON_TERMINAL);
     static YYToken DOLLAR = new YYToken("$", TokenType.TERMINAL);
     private String symbol;
     YYToken(String symbol, TokenType type) {
@@ -25,6 +25,13 @@ public class YYToken {
         return this.symbol;
     }
 
+    static YYToken nonTerminal(String symbol) {
+        return new YYToken(symbol, TokenType.NON_TERMINAL);
+    }
+
+    static YYToken terminal(String symbol) {
+        return new YYToken(symbol, TokenType.TERMINAL);
+    }
     @Override
     public boolean equals(Object o) {
         if(o == this) {
@@ -41,6 +48,11 @@ public class YYToken {
         }
 
         return this.symbol.equals(toCompare.symbol);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(symbol, type);
     }
 }
 
