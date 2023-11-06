@@ -4,10 +4,11 @@ import java.util.Objects;
  * Implementation for YYToken class
  */
 public class YYToken {
-    public TokenType type;
-    static YYToken EPSILON = new YYToken("\0", TokenType.NON_TERMINAL);
+    private final TokenType type;
+    static YYToken EPSILON = new YYToken("EPSILON", TokenType.TERMINAL);
     static YYToken DOLLAR = new YYToken("$", TokenType.TERMINAL);
-    private String symbol;
+    static YYToken START = new YYToken("S", TokenType.NON_TERMINAL);
+    private final String symbol;
     YYToken(String symbol, TokenType type) {
         this.symbol = symbol;
         this.type = type;
@@ -43,7 +44,7 @@ public class YYToken {
         }
 
         // Typecast
-        if (this.type != toCompare.type) {
+        if (!this.type.equals(toCompare.type)) {
             return false;
         }
 

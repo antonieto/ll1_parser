@@ -5,21 +5,27 @@ import java.util.*;
  */
 public class ParsingTable {
     // Use a Map of Maps
-    private HashMap<YYToken, HashMap<YYToken, Rule>> map;
-    ParsingTable(HashMap<YYToken, HashMap<YYToken, Rule>> map) {
+    private final HashMap<YYToken, HashMap<YYToken, Rule>> map;
+    private final HashMap<String, YYToken> symbolMap;
+    ParsingTable(HashMap<YYToken, HashMap<YYToken, Rule>> map, HashMap<String, YYToken> symbolMap) {
         this.map = map;
+        this.symbolMap = symbolMap;
     }
     static ParsingTableBuilder builder(List<YYToken> tokenList) {
         return new ParsingTableBuilder(tokenList);
     }
 
     public boolean has(YYToken token) {
-        return false;
+        var gotten = symbolMap.get(token.toString());
+        return gotten == null;
     }
     public Optional<Rule> at(YYToken nonTerminal, YYToken terminal) {
-        return Optional.empty();
+        var gotten = map.get(nonTerminal).get(terminal);
+        if (gotten == null) {
+            return Optional.empty();
+        }
+        return Optional.of(gotten);
     }
-
 }
 
 record ParsingTableEntry(String nonTerminal, String terminal, Rule rule) {
@@ -37,6 +43,11 @@ class ParsingTableBuilder {
 
     ParsingTableBuilder(List<YYToken> tokenList) {
         symbolMap = new HashMap<>();
+
+        // Insert default symbols
+        symbolMap.put(YYToken.EPSILON.toString(), YYToken.EPSILON);
+        symbolMap.put(YYToken.DOLLAR.toString(), YYToken.DOLLAR);
+
         for(YYToken token: tokenList) {
             symbolMap.put(token.toString(), token);
         }
@@ -50,7 +61,7 @@ class ParsingTableBuilder {
         for(String productionToken: productionTokens) {
             YYToken gotten = symbolMap.get(productionToken);
             if(gotten == null) {
-                throw new GrammarException("Production rule has undefined symbol: " + productionToken);
+                throw new GrammarException(String.format("Production rule %s has undefined symbol: %s", production, productionToken));
             }
             tokens.add(gotten);
         }
@@ -72,22 +83,13 @@ class ParsingTableBuilder {
             YYToken columnKey = new YYToken(entry.terminal(), TokenType.TERMINAL);
             var row = map.get(rowKey);
             if(row == null) {
-                row = map.put(rowKey, new HashMap<>());
+                map.put(rowKey, new HashMap<>());
             }
+            row = map.get(rowKey);
             assert row != null;
             row.put(columnKey, entry.rule());
         }
-        return new ParsingTable(map);
+        return new ParsingTable(map, symbolMap);
     }
 }
 
-class GrammarException extends Exception {
-    private final String message;
-    GrammarException(String message) {
-        this.message = message;
-    }
-    @Override
-    public String toString() {
-        return message;
-    }
-}

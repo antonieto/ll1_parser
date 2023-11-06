@@ -1,9 +1,8 @@
+import java.text.ParseException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException, GrammarException {
         // Declare all tokens (non-terminals and terminals)
         YYToken[] tokenList = {
                 YYToken.nonTerminal("S"),
@@ -18,43 +17,55 @@ public class Main {
                 YYToken.terminal(")"),
                 YYToken.terminal(","),
                 YYToken.terminal("f"),
-                YYToken.DOLLAR,
                 YYToken.terminal("n"),
         };
-        try {
-            var table = ParsingTable.builder(Arrays.asList(tokenList))
-                    .add("S", "(", "A $")
-                    .add("S", "f", "A $")
-                    .add("S", "n", "A $")
+         ParsingTable table = ParsingTable.builder(Arrays.asList(tokenList))
+                .add("S", "(", "A $")
+                .add("S", "f", "A $")
+                .add("S", "n", "A $")
 
-                    .add("A", "(", "F B")
-                    .add("A", "f", "F B")
-                    .add("A", "n", "F B")
+                .add("A", "(", "F B")
+                .add("A", "f", "F B")
+                .add("A", "n", "F B")
 
-                    .add("B", "+", "A $")
-                    .add("B", ")", "A $")
-                    .add("B", "$", "A $")
+                .add("B", "+", "+ F B")
+                .add("B", ")", "EPSILON")
+                .add("B", "$", "EPSILON")
+                 .add("B", ",", "EPSILON")
 
-                    .add("F", "(", "( A )")
-                    .add("F", "f", "f ( R")
-                    .add("F", "n", "n")
+                .add("F", "(", "( A )")
+                .add("F", "f", "f ( R")
+                .add("F", "n", "n")
 
-                    .add("R", "(", "P )")
-                    .add("R", ")", ")")
-                    .add("R", "f", "P )")
-                    .add("R", "n", "P )")
+                .add("R", "(", "P )")
+                .add("R", ")", ")")
+                .add("R", "f", "P )")
+                .add("R", "n", "P )")
 
-                    .add("P", "(", "A Q")
-                    .add("P", "f", "A Q")
-                    .add("P", "n", "A Q")
+                .add("P", "(", "A Q")
+                .add("P", "f", "A Q")
+                .add("P", "n", "A Q")
 
-                    .add("Q", ")", "\0")
-                    .add("Q", ",", ", A")
-                    .build();
-        } catch (GrammarException exc) {
-            System.out.println("Invalid parsing table");
-            System.out.println(exc.toString());
-        }
+                .add("Q", ")", "EPSILON")
+                .add("Q", ",", ", A")
+                .build();
 
+        assert table != null;
+
+        Parser parser = new Parser(
+                table
+        );
+
+        YYToken[] test = {
+                YYToken.terminal("("),
+                YYToken.terminal("f"),
+                YYToken.terminal("("),
+                YYToken.terminal("n"),
+                YYToken.terminal(")"),
+                YYToken.terminal("+"),
+        };
+
+        parser.parse(test);
+        System.out.println("Parsed successfully!");
     }
 }
