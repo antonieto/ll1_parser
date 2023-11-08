@@ -26,11 +26,11 @@ public class YYToken {
         return this.symbol;
     }
 
-    static YYToken nonTerminal(String symbol) {
+    public static YYToken nonTerminal(String symbol) {
         return new YYToken(symbol, TokenType.NON_TERMINAL);
     }
 
-    static YYToken terminal(String symbol) {
+    public static YYToken terminal(String symbol) {
         return new YYToken(symbol, TokenType.TERMINAL);
     }
     @Override
