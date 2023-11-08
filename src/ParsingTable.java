@@ -5,21 +5,21 @@ import java.util.*;
  */
 public class ParsingTable {
     // Use a Map of Maps
-    private final HashMap<YYToken, HashMap<YYToken, Rule>> map;
-    private final HashMap<String, YYToken> symbolMap;
-    ParsingTable(HashMap<YYToken, HashMap<YYToken, Rule>> map, HashMap<String, YYToken> symbolMap) {
+    private final HashMap<Token, HashMap<Token, Rule>> map;
+    private final HashMap<String, Token> symbolMap;
+    ParsingTable(HashMap<Token, HashMap<Token, Rule>> map, HashMap<String, Token> symbolMap) {
         this.map = map;
         this.symbolMap = symbolMap;
     }
-    static ParsingTableBuilder builder(List<YYToken> tokenList) {
+    static ParsingTableBuilder builder(List<Token> tokenList) {
         return new ParsingTableBuilder(tokenList);
     }
 
-    public boolean has(YYToken token) {
+    public boolean has(Token token) {
         var gotten = symbolMap.get(token.toString());
         return gotten == null;
     }
-    public Optional<Rule> at(YYToken nonTerminal, YYToken terminal) {
+    public Optional<Rule> at(Token nonTerminal, Token terminal) {
         var gotten = map.get(nonTerminal).get(terminal);
         if (gotten == null) {
             return Optional.empty();
@@ -39,16 +39,16 @@ class ParsingTableBuilder {
     final private Set<ParsingTableEntry> entries;
 
     // Map to quickly get a token based on a symbol
-    final private HashMap<String, YYToken> symbolMap;
+    final private HashMap<String, Token> symbolMap;
 
-    ParsingTableBuilder(List<YYToken> tokenList) {
+    ParsingTableBuilder(List<Token> tokenList) {
         symbolMap = new HashMap<>();
 
         // Insert default symbols
-        symbolMap.put(YYToken.EPSILON.toString(), YYToken.EPSILON);
-        symbolMap.put(YYToken.DOLLAR.toString(), YYToken.DOLLAR);
+        symbolMap.put(Token.EPSILON.toString(), Token.EPSILON);
+        symbolMap.put(Token.DOLLAR.toString(), Token.DOLLAR);
 
-        for(YYToken token: tokenList) {
+        for(Token token: tokenList) {
             symbolMap.put(token.toString(), token);
         }
         entries = new HashSet<>();
@@ -57,9 +57,9 @@ class ParsingTableBuilder {
     public ParsingTableBuilder add(String nonTerminal, String terminal, String production) throws GrammarException {
         // 1. Need to verify the symbols in the production (check that they belong in the token set).
         String[] productionTokens = production.trim().split(" ");
-        List<YYToken> tokens = new ArrayList<>();
+        List<Token> tokens = new ArrayList<>();
         for(String productionToken: productionTokens) {
-            YYToken gotten = symbolMap.get(productionToken);
+            Token gotten = symbolMap.get(productionToken);
             if(gotten == null) {
                 throw new GrammarException(String.format("Production rule %s has undefined symbol: %s", production, productionToken));
             }
@@ -77,10 +77,10 @@ class ParsingTableBuilder {
     }
 
     public ParsingTable build() {
-        HashMap<YYToken, HashMap<YYToken, Rule>> map = new HashMap<>();
+        HashMap<Token, HashMap<Token, Rule>> map = new HashMap<>();
         for(ParsingTableEntry entry: entries) {
-            YYToken rowKey = new YYToken(entry.nonTerminal(), TokenType.NON_TERMINAL);
-            YYToken columnKey = new YYToken(entry.terminal(), TokenType.TERMINAL);
+            Token rowKey = new Token(entry.nonTerminal(), TokenType.NON_TERMINAL);
+            Token columnKey = new Token(entry.terminal(), TokenType.TERMINAL);
             var row = map.get(rowKey);
             if(row == null) {
                 map.put(rowKey, new HashMap<>());

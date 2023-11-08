@@ -9,14 +9,14 @@ public class Parser {
     Parser(ParsingTable table) {
         this.table = table;
     }
-    public void parse(YYToken[] tokens) throws ParseException {
-        Stack<YYToken> stack = new Stack<>();
-        stack.push(YYToken.START);
+    public void parse(Token[] tokens) throws ParseException {
+        Stack<Token> stack = new Stack<>();
+        stack.push(Token.START);
         int current = 0;
         while (!stack.isEmpty() && current < tokens.length) {
-            YYToken top = stack.peek();
-            YYToken currentToken = tokens[current];
-            if (top.isTerminal() || top.equals(YYToken.DOLLAR)) {
+            Token top = stack.peek();
+            Token currentToken = tokens[current];
+            if (top.isTerminal() || top.equals(Token.DOLLAR)) {
                 if (top.equals(currentToken)) {
                     stack.pop();
                     current++;
@@ -28,8 +28,8 @@ public class Parser {
                     Rule rule = table.at(top, currentToken).get();
                     stack.pop();
                     System.out.println("Added rule: " + rule);
-                    for (YYToken token: rule.production().reversed()) {
-                        if(!token.equals(YYToken.EPSILON)) stack.push(token);
+                    for (Token token: rule.production().reversed()) {
+                        if(!token.equals(Token.EPSILON)) stack.push(token);
                     }
                 } else {
 

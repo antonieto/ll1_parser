@@ -4,20 +4,20 @@ import java.util.Arrays;
 public class Main {
     public static void main(String[] args) throws ParseException, GrammarException {
         // Declare all tokens (non-terminals and terminals)
-        YYToken[] tokenList = {
-                YYToken.nonTerminal("S"),
-                YYToken.nonTerminal("A"),
-                YYToken.nonTerminal("B"),
-                YYToken.nonTerminal("F"),
-                YYToken.nonTerminal("R"),
-                YYToken.nonTerminal("P"),
-                YYToken.nonTerminal("Q"),
-                YYToken.terminal("+"),
-                YYToken.terminal("("),
-                YYToken.terminal(")"),
-                YYToken.terminal(","),
-                YYToken.terminal("f"),
-                YYToken.terminal("n"),
+        Token[] tokenList = {
+                Token.nonTerminal("S"),
+                Token.nonTerminal("A"),
+                Token.nonTerminal("B"),
+                Token.nonTerminal("F"),
+                Token.nonTerminal("R"),
+                Token.nonTerminal("P"),
+                Token.nonTerminal("Q"),
+                Token.terminal("+"),
+                Token.terminal("("),
+                Token.terminal(")"),
+                Token.terminal(","),
+                Token.terminal("f"),
+                Token.terminal("n"),
         };
          ParsingTable table = ParsingTable.builder(Arrays.asList(tokenList))
                 .add("S", "(", "A $")
@@ -56,13 +56,13 @@ public class Main {
                 table
         );
 
-        YYToken[] test = {
-                YYToken.terminal("("),
-                YYToken.terminal("f"),
-                YYToken.terminal("("),
-                YYToken.terminal("n"),
-                YYToken.terminal(")"),
-                YYToken.terminal("+"),
+        Token[] test = {
+                Token.terminal("("),
+                Token.terminal("f"),
+                Token.terminal("("),
+                Token.terminal("n"),
+                Token.terminal(")"),
+                Token.terminal("+"),
         };
 
         parser.parse(test);

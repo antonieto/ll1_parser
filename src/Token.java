@@ -3,13 +3,13 @@ import java.util.Objects;
 /**
  * Implementation for YYToken class
  */
-public class YYToken {
+public class Token {
     private final TokenType type;
-    static YYToken EPSILON = new YYToken("EPSILON", TokenType.TERMINAL);
-    static YYToken DOLLAR = new YYToken("$", TokenType.TERMINAL);
-    static YYToken START = new YYToken("S", TokenType.NON_TERMINAL);
+    static Token EPSILON = new Token("EPSILON", TokenType.TERMINAL);
+    static Token DOLLAR = new Token("$", TokenType.TERMINAL);
+    static Token START = new Token("S", TokenType.NON_TERMINAL);
     private final String symbol;
-    YYToken(String symbol, TokenType type) {
+    Token(String symbol, TokenType type) {
         this.symbol = symbol;
         this.type = type;
     }
@@ -26,12 +26,12 @@ public class YYToken {
         return this.symbol;
     }
 
-    public static YYToken nonTerminal(String symbol) {
-        return new YYToken(symbol, TokenType.NON_TERMINAL);
+    public static Token nonTerminal(String symbol) {
+        return new Token(symbol, TokenType.NON_TERMINAL);
     }
 
-    public static YYToken terminal(String symbol) {
-        return new YYToken(symbol, TokenType.TERMINAL);
+    public static Token terminal(String symbol) {
+        return new Token(symbol, TokenType.TERMINAL);
     }
     @Override
     public boolean equals(Object o) {
@@ -39,7 +39,7 @@ public class YYToken {
             return true;
         }
 
-        if (!(o instanceof YYToken toCompare)) {
+        if (!(o instanceof Token toCompare)) {
             return false;
         }
 

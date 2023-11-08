@@ -4,20 +4,20 @@ import java.util.List;
  * A class that represents a CFG production rule
  */
 public class Rule {
-    final private YYToken ant;
-    final private List<YYToken> production;
+    final private Token ant;
+    final private List<Token> production;
 
-    Rule(String ant, List<YYToken> production) {
-        this.ant = YYToken.nonTerminal(ant);
+    Rule(String ant, List<Token> production) {
+        this.ant = Token.nonTerminal(ant);
         this.production = production;
     }
 
     public String toString() {
         return this.ant.toString() + " -> " +
-                this.production.stream().map(YYToken::toString).reduce((acc, el) -> acc + el).get();
+                this.production.stream().map(Token::toString).reduce((acc, el) -> acc + el).get();
     }
 
-    public List<YYToken> production() {
+    public List<Token> production() {
         return this.production;
     }
 }
